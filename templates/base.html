@@ -32,6 +32,42 @@
         nav a:hover {
             color: #666;
         }
+
+        .flash {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 3px;
+        }
+
+        .flash.success {
+            background-color: #dff0d8;
+            border: 1px solid #d0ecd0;
+            color: #5cb85c;
+        }
+
+        .flash.info {
+            background-color: #d8e0f0;
+            border: 1px solid #9eacdf;
+            color: #625cb8;
+        }
+
+        .flash.message {
+            background-color: #d8e0f0;
+            border: 1px solid #9eacdf;
+            color: #625cb8;
+        }
+
+        .flash.warning {
+            background-color: #fcf8e3;
+            border: 1px solid #f9e2b5;
+            color: #f0ad4e;
+        }
+
+        .flash.error {
+            background-color: #f2dcdc;
+            border: 1px solid #e6b7b7;
+            color: #c0392b;
+        }
     </style>
     {% block style %} {% endblock %}
 </head>
@@ -39,11 +75,15 @@
     <header> 
         <nav> <ul> 
                 <li><a href="/">Новости</a></li> 
-                <li><a href="/contact">Контакты</a></li>
-                <li><a href="/about">О нас</a></li> 
-                <li><a href="/login">Авторизация</a></li> 
+                <li><a href="/community">Сообщество</a></li> 
+                <li><a href="/contact_us">Контакты</a></li>
+                <li><a href="/about_us">О нас</a></li> 
+                <li><a href="/profile">Профиль</a></li>
         </ul> </nav>
     </header>
+    {% for cat, msg in get_flashed_messages(True) %}
+        <div class="flash {{cat}}">{{msg}}</div>
+    {% endfor %}
     {% block content %} {% endblock %}
 </body>
 </html>
