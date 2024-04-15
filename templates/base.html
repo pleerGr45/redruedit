@@ -3,13 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% block title %} {% endblock %}
+    <title>{% block title %} {% endblock %}</title>
     <style>
+        header {
+            background-color: #f5f5f5;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
 
+        nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: left;
+        }
+
+        nav li {
+            margin-right: 20px;
+        }
+
+        nav a {
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            color: #666;
+        }
     </style>
     {% block style %} {% endblock %}
 </head>
 <body>
+    <header> 
+        <nav> <ul> 
+                <li><a href="/">Новости</a></li> 
+                <li><a href="/contact">Контакты</a></li>
+                <li><a href="/about">О нас</a></li> 
+                <li><a href="/login">Авторизация</a></li> 
+        </ul> </nav>
+    </header>
     {% block content %} {% endblock %}
 </body>
 </html>
