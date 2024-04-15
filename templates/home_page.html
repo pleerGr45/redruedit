@@ -57,8 +57,7 @@
 {% block content %} 
 <form action="/" method="post">
     <input type="text" name="title" placeholder="Заголовок" required>
-    <input type="text" name="post_owner" placeholder="Имя пользователя">
-    <input type="text" name="content" placeholder="Содержание">
+    <textarea type="textarea" name="content" placeholder="Содержание" rows="10" cols="32" required></textarea>
     <input type="submit" value="Отправить">
 </form>
 {% endblock %}

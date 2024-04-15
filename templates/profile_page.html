@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %} Профиль {% endblock %}
+{% block style %} 
+<style>
+
+</style>
+{% endblock %}
+{% block content %} 
+<a href="/logout">Выход</a>
+Логин: {{profile.login}}
+Пароль: {{profile.password}}
+Имя пользователя: {{profile.user_name}}
+Описание: {{profile.user_about}}
+День рождения: {{profile.birthdate}}
+Дата создания аккаунта: {{profile.date_creation}}
+{% endblock %}

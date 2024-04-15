@@ -1,7 +1,7 @@
 #Иморты
 from flask import Flask, render_template, request, redirect, flash
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import LoginManager
+from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 #Импорты для работы с датой и временем
 from datetime import datetime
 import pytz
@@ -15,14 +15,18 @@ from sqlalchemy.orm import declarative_base
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4AWDc\n\xec]/'
 
-#Создание Менеджера логинов
+#Настройка Менеджера логинов
+login_manager = LoginManager(app)
+login_manager.login_view = 'login_page'
+login_manager.login_message = 'Для доступа необходимо осуществить вход в систему'
 
 #Настройка базы данных
 engine = create_engine('sqlite:///news.db')
 Base = declarative_base()
 
+#Создание модели AUTH
 class Auth(Base):
-  __tablename__ = 'authorized_users'
+  __tablename__ = 'authorized_users' 
 
   id = Column(Integer, primary_key=True)
   login = Column(String(32), nullable=False, unique=True)
@@ -32,7 +36,7 @@ class Auth(Base):
   user_birthdate = Column(DateTime(timezone=True))
   date_creation = Column(DateTime(timezone=True), default=datetime.now(pytz.timezone('Europe/Moscow')))
 
-#Создание модели
+#Создание модели NEWS
 class News(Base):
   __tablename__ = 'news'
 
@@ -48,13 +52,37 @@ Base.metadata.create_all(engine)
 session = sessionmaker(bind=engine)()
 session.rollback()
 
-#####################################################################
-#               ___    ___           ___         _____              #
-#      |\  /|  |___|  |___|  |   |  |___|  \  /    |    |    |      #
-#      | \/ |  |   |  |      | | |  |       \/     |    |__  |      #
-#      |    |  |   |  |      |_|_|  |       /      |    |__| |      #
-#                                                                   #
-#####################################################################
+#Создание класса пользователя
+class UserLogin():
+   def fromDB(self, user_id):
+      self.__user = session.query(Auth).filter_by(id=user_id)
+      return self
+   
+   def create(self, user):
+      self.__user = user
+      return self
+   
+   def is_authenticated(self):
+      return True
+   def is_active(self):
+      return True
+   def is_anonymoys(self):
+      return False
+   def get_id(self):
+      return self.__user.id
+
+#Обработчик загрузок пользователей
+@login_manager.user_loader
+def load_user(user_id): 
+   return UserLogin().fromDB(user_id)
+
+#######################################################################################
+#                        ___    ___           ___         _____                       #
+#               |\  /|  |___|  |___|  |   |  |___|  \  /    |    |    |               #
+#               | \/ |  |   |  |      | | |  |       \/     |    |__  |               #
+#               |    |  |   |  |      |_|_|  |       /      |    |__| |               #
+#                                                                                     #
+#######################################################################################
 
 @app.route("/", methods=['GET', 'POST'])
 def home_page():
@@ -71,6 +99,26 @@ def home_page():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login_page():
+    #Если POST запрос
+    if request.method == 'POST':
+       
+       #Получение получение пользователя по логину
+       user = session.query(Auth).filter_by(login=request.form['login']).first()
+
+       #Проверка на существование пользователя, на сходство паролей
+       if user and check_password_hash(user.password, request.form['pass']):
+          #Логининг пользователя
+          user_login = UserLogin().create(user)
+          login_user(user_login, remember=bool(request.form.get('remainme')))
+          #Отправка сообщения пользователю об успехе
+          flash('Произошёл успешный вход', 'success')
+          #Перенаправление на главную страницу
+          return redirect('/')
+       
+       #Отправка сообщения пользователю об ошибке
+       flash('Неверная пара логина и пароля', 'error')
+   
+    #Загрузка шаблона login_page.html
     return render_template("login_page.html")
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -108,8 +156,29 @@ def register_page():
     #Загрузка шаблона register_page.html
     return render_template("register_page.html")
 
+@app.route("/community")
+@login_required
+def community_page():
+    return render_template("community_page.html")
+
+@app.route("/contact_us")
 def contact_page():
     return render_template("contact_page.html")
+
+@app.route("/about_us")
+def about_page():
+    return render_template("about_page.html")
+
+@app.route("/logout")
+def logout_page():
+    logout_user()
+    flash('Произошёл выход из аккаунта', 'info')
+    return redirect('/login')
+
+@app.route("/profile")
+@login_required
+def profile_page():
+    return render_template("profile_page.html", profile = current_user)
 
 #######################################################################################
 #        ___     ___    ___        _____                                              #
