@@ -37,6 +37,8 @@ class Auth(Base):
     user_birthdate = Column(DateTime(timezone=True))
     date_creation = Column(DateTime(timezone=True),
                            default=datetime.now(pytz.timezone('Europe/Moscow')))
+    user_phone = Column(String)
+    user_emal = Column(String)
 
 # Создание модели NEWS
 
@@ -65,10 +67,12 @@ session.rollback()
 class UserLogin():
     def fromDB(self, user_id):
         self.__user = session.query(Auth).filter_by(id=user_id)
+        self.__id = user_id
         return self
 
     def create(self, user):
         self.__user = user
+        self.__id = user.id
         return self
 
     def is_authenticated(self):
@@ -81,7 +85,7 @@ class UserLogin():
         return False
 
     def get_id(self):
-        return self.__user.id
+        return self.__id
 
 # Обработчик загрузок пользователей
 
@@ -116,6 +120,10 @@ def home_page():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login_page():
+    # Если пользователь уже авторизован
+    if current_user.is_authenticated:
+        return redirect(url_for('profile_page'))
+
     # Если POST запрос
     if request.method == 'POST':
 
@@ -203,7 +211,9 @@ def logout_page():
 @app.route("/profile")
 @login_required
 def profile_page():
-    return render_template("profile_page.html", profile=current_user)
+    user_metadata = session.query(Auth).filter_by(
+        id=current_user.get_id()).first()
+    return render_template("profile_page.html", profile=user_metadata)
 
 #######################################################################################
 #        ___     ___    ___        _____                                              #

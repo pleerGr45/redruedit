@@ -2,16 +2,6 @@
 {% block title %} Регистрация {% endblock %}
 {% block style %}
 <link rel="stylesheet" href="{{url_for('static', filename='css/input_style.css')}}">
-<style>
-    form {
-        width: 400px;
-        margin: 20px auto;
-        background-color: #f5f5f5;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-</style>
 {% endblock %}
 {% block content %}
 <form action="/register" method="post">
