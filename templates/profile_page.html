@@ -1,16 +1,66 @@
 {% extends "base.html" %}
 {% block title %} Профиль {% endblock %}
 {% block style %} 
+<link rel="stylesheet" href="{{url_for('static', filename='css/input_style.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/text_area_style.css')}}">
 <style>
+    div {
+        margin-bottom: 7px
+    }
 
+    btn {
+        display: flex;
+        justify-content: flex-start;
+    }
+
+    button {
+        padding: 10px 15px;
+        color: #f74859;
+        border: 1px solid #f74859;
+        border-radius: 3px;
+        background-color: #f5f5f5;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        margin-right: 20px;
+        text-decoration: none;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    button:hover, button:focus {
+        color: #fff;
+        background-color: #fc2847;
+        border-color: #fc2847;
+    }
+
+    hr {
+        margin: 0;
+        margin-bottom: 10px;
+    }
 </style>
 {% endblock %}
 {% block content %} 
-<a href="/logout">Выход</a>
-Логин: {{profile.login}}
-Пароль: {{profile.password}}
-Имя пользователя: {{profile.user_name}}
-Описание: {{profile.user_about}}
-День рождения: {{profile.birthdate}}
-Дата создания аккаунта: {{profile.date_creation}}
+<form action="{{url_for('profile_page')}}" method="post">
+    <div>
+        <label for="user_login">Логин</label>
+        <input type="text" name="user_login" value="{{profile.login}}" disabled required>
+    </div>
+    <div>
+        <label for="user_name">Имя пользователя</label>
+        <input type="text" name="user_name" value="{{profile.user_name}}" minlength="5" maxlength="32" required>
+    </div>
+    <div>
+        <label for="user_about">Информация о пользователе</label>
+        <textarea type="textarea" name="user_about" placeholder="Не указано" rows="4" maxlength="256"> 
+            {% if profile.user_about %}
+                {{profile.user_about}}
+            {% endif %}</textarea>
+    </div>
+        <input type="submit" value="Сохранить">
+    <hr>
+    <btn>
+        <button action="/logout">Выход</button>
+        <button action="/del">Удалить аккаунт</button>
+    </btn>
+</form>
+
 {% endblock %}
