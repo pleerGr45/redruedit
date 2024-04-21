@@ -1,10 +1,40 @@
 {% extends "base.html" %}
 {% block title %} Обратная связь {% endblock %}
-{% block style %} 
+{% block style %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/input_style.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/text_area_style.css')}}">
 <style>
 
 </style>
 {% endblock %}
 {% block content %} 
-мы в тг: 98989823992
+<form>
+    <div>
+        <label for="tg">Мы в телеграме</label>
+        <input type="text" name="tg" value="@dev777" disabled required>
+    </div>
+    <div>
+        <label for="user_name">Имя пользователя</label>
+        <input type="text" name="user_name" value="{{profile.user_name}}" minlength="5" maxlength="32" required>
+    </div>
+    <div>
+        <label for="user_e_mail">Электронная почта</label>
+        <input type="email" name="user_e_mail" value="{% if profile.user_email != None %}{{profile.user_email}}{% endif %}" placeholder="user@example.com">
+    </div>
+    <div>
+        <label for="user_phone">Номер телефона</label>
+        <input type="tel" name="user_phone" pattern="[7]{1}-[0-9]{3}-[0-9]{3}-[0-9]{2}-[0-9]{2}" value="{% if profile.user_phone != None %}{{profile.user_phone}}{% endif %}" placeholder="7-XXX-XXX-XX-X">
+    </div>
+    <div>
+        <label for="user_about">Информация о пользователе</label>
+        <textarea type="textarea" name="user_about" placeholder="Не указано" rows="4" maxlength="256">{% if profile.user_about %}{{profile.user_about}}{% endif %}</textarea>
+    </div>
+    <div>
+        <label for="user_birthdate">День рождения</label>
+        <input type="date" name="user_birthdate" value="{{profile.user_birthdate}}" placeholder="Не указано">
+    </div>
+    <div>
+        <label for="date_creation">Дата создания</label>
+        <input type="date" name="date_creation" value="{{profile.date_creation}}" placeholder="Не указано">
+    </div>
 {% endblock %}

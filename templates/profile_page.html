@@ -13,7 +13,7 @@
         justify-content: flex-start;
     }
 
-    button {
+    .button {
         padding: 10px 15px;
         color: #f74859;
         border: 1px solid #f74859;
@@ -26,10 +26,14 @@
         cursor: pointer;
     }
 
-    button:hover, button:focus {
+    .button:hover, .button:focus {
         color: #fff;
         background-color: #fc2847;
         border-color: #fc2847;
+    }
+
+    input, textarea {
+        margin-top: 10px;
     }
 
     hr {
@@ -49,18 +53,30 @@
         <input type="text" name="user_name" value="{{profile.user_name}}" minlength="5" maxlength="32" required>
     </div>
     <div>
+        <label for="user_e_mail">Электронная почта</label>
+        <input type="email" name="user_e_mail" value="{% if profile.user_email != None %}{{profile.user_email}}{% endif %}" placeholder="user@example.com">
+    </div>
+    <div>
+        <label for="user_phone">Номер телефона</label>
+        <input type="tel" name="user_phone" pattern="[7]{1}-[0-9]{3}-[0-9]{3}-[0-9]{2}-[0-9]{2}" value="{% if profile.user_phone != None %}{{profile.user_phone}}{% endif %}" placeholder="7-XXX-XXX-XX-X">
+    </div>
+    <div>
         <label for="user_about">Информация о пользователе</label>
-        <textarea type="textarea" name="user_about" placeholder="Не указано" rows="4" maxlength="256"> 
-            {% if profile.user_about %}
-                {{profile.user_about}}
-            {% endif %}</textarea>
+        <textarea type="textarea" name="user_about" placeholder="Не указано" rows="4" maxlength="256">{% if profile.user_about %}{{profile.user_about}}{% endif %}</textarea>
+    </div>
+    <div>
+        <label for="user_birthdate">День рождения</label>
+        <input type="date" name="user_birthdate" value="{{profile.user_birthdate}}" placeholder="Не указано">
+    </div>
+    <div>
+        <label for="date_creation">Дата создания</label>
+        <input type="date" name="date_creation" value="{{profile.date_creation}}" placeholder="Не указано">
     </div>
         <input type="submit" value="Сохранить">
     <hr>
     <btn>
-        <button action="/logout">Выход</button>
-        <button action="/del">Удалить аккаунт</button>
+        <a href="/logout" class="button">Выход</a>
+        <a href="/delet" class="button">Удалить аккаунт</a>
     </btn>
 </form>
-
 {% endblock %}
