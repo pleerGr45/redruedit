@@ -1,6 +1,9 @@
 input[type="text"],
 input[type="password"],
-input[type="submit"] {
+input[type="submit"],
+input[type="email"],
+input[type="tel"],
+input[type="date"] {
   width: -webkit-fill-available;
   padding: 10px;
   margin-bottom: 10px;
@@ -11,6 +14,9 @@ input[type="submit"] {
 
 input[type="text"]:focus,
 input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus,
 input[type="submit"]:focus {
   outline: none;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -58,8 +64,10 @@ hr {
 }
 
 label {
-  font-family: Arial, Helvetica, sans-serif;
-  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  text-shadow: none;
+  font-weight: 500;
   font-size: 14px;
   color: #5f5f5f;
   text-decoration: none;

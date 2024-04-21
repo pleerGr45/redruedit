@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %} {{profile.login}} профиль {% endblock %}
+{% block style %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/input_style.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/text_area_style.css')}}">
+<style>
+    form {
+        width: 700px;
+    }
+    div {
+        margin-bottom: 7px
+    }
+
+    contbox {
+        display: flex;
+        flex-direction: row;
+    }
+
+    cont {
+        display: flex;
+        flex-direction: column;
+        margin-right: 5px;
+        margin-left: 5px;
+    }
+
+    input {
+        height: 15px;
+    }
+
+    textarea {
+        margin-bottom: 0px;
+    }
+
+    input, textarea {
+        margin-top: 10px;
+    }
+
+    hr {
+        margin: 0;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+{% block content %} 
+<form>
+    <contbox>
+        <cont>
+            <div>
+                <label for="user_login">Логин</label>
+                <input type="text" name="user_login" value="{{profile.login}}" disabled>
+            </div>
+            <div>
+                <label for="user_name">Имя пользователя</label>
+                <input type="text" name="user_name" value="{{profile.user_name}}" disabled>
+            </div>
+        </cont>
+        <cont>
+            <div>
+                <label for="user_e_mail">Электронная почта</label>
+                <input type="email" name="user_e_mail" value="{% if profile.user_email != None %}{{profile.user_email}}{% endif %}" placeholder="Не указано" disabled>
+            </div>
+            <div>
+                <label for="user_phone">Номер телефона</label>
+                <input type="tel" name="user_phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{2}-[0-9]{2}" value="{% if profile.user_phone != None %}{{profile.user_phone}}{% endif %}" placeholder="Не указано" disabled>
+            </div>
+        </cont>
+        <cont>
+            <div>
+                <label for="user_birthdate">День рождения</label>
+                <input type="date" name="user_birthdate" value="{{profile.user_birthdate}}" disabled>
+            </div>
+            <div>
+                <label for="date_creation">Дата создания</label>
+                <input type="date" name="date_creation" value="{{profile.date_creation}}" disabled>
+            </div>
+        </cont>
+    </contbox>
+    <div>
+        <label for="user_about">Информация о пользователе</label>
+        <textarea type="textarea" name="user_about" placeholder="Не указано" disabled>{% if profile.user_about %}{{profile.user_about}}{% endif %}</textarea>
+    </div>
+</form>
+{% endblock %}

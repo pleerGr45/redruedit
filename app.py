@@ -1,13 +1,14 @@
 # Иморты
-from flask import Flask, render_template, request, redirect, flash, url_for
+from flask import Flask, render_template, request, redirect, flash, url_for, abort
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.exceptions import NotFound, InternalServerError
 from flask_login import LoginManager, login_user, logout_user, current_user, login_required
 # Импорты для работы с датой и временем
 from datetime import datetime
 import pytz
 
 # Импорт модулей для работы с БД
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, Text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import declarative_base
 
@@ -34,18 +35,15 @@ class Auth(Base):
     password = Column(String(32), nullable=False)
     user_name = Column(String(32), nullable=False)
     user_about = Column(String)
-    user_birthdate = Column(DateTime(timezone=True))
-    date_creation = Column(DateTime(timezone=True),
-                           default=datetime.now(pytz.timezone('Europe/Moscow')))
+    user_birthdate = Column(String)
+    date_creation = Column(String)
     user_phone = Column(String)
-    user_emal = Column(String)
+    user_email = Column(String)
 
 # Создание модели NEWS
 
 
 class News(Base):
-    """
-    """
     __tablename__ = 'news'
 
     id = Column(Integer, primary_key=True)
@@ -163,12 +161,13 @@ def register_page():
         if len(login) > 4 and len(login) <= 32 and len(name) > 4 and len(name) <= 32\
                 and len(password) > 5 and len(password) <= 32 and password == password_repeat:
             # Проверка логина
-            if check_login(login) == False:
+            if not check_login(login):
                 # Генерация скрытого пароля
                 pass_hash = generate_password_hash(password)
                 # Отправка в базу данных
+                datedb = datetime.now(pytz.timezone('Europe/Moscow')).date()
                 session.add(
-                    Auth(login=login, password=pass_hash, user_name=name))
+                    Auth(login=login, password=pass_hash, user_name=name, date_creation=f'{datedb.day}.{datedb.month}.{datedb.year}'))
                 session.commit()
                 # Отправка сообщения пользователю об успехе
                 flash('Вы успешно зарегистрированы', 'success')
@@ -208,12 +207,49 @@ def logout_page():
     return redirect(url_for('login_page'))
 
 
-@app.route("/profile")
+@app.route("/delete")
+def delete_page():
+    session.delete(session.query(Auth).filter_by(
+        id=current_user.get_id()).first())
+    logout_user()
+    flash('Аккаунт удалён', 'error')
+    return redirect(url_for('login_page'))
+
+
+@app.route("/profile", methods=['GET', 'POST'])
 @login_required
 def profile_page():
     user_metadata = session.query(Auth).filter_by(
         id=current_user.get_id()).first()
+    if request.method == 'POST':
+        user_metadata.user_name = request.form['user_name']
+        user_metadata.user_email = request.form['user_e_mail']
+        user_metadata.user_phone = request.form['user_phone']
+        user_metadata.user_about = request.form['user_about']
+        user_metadata.user_birthdate = request.form['user_birthdate']
+        user_metadata.date_creation = request.form['date_creation']
+
     return render_template("profile_page.html", profile=user_metadata)
+
+
+@app.route("/view_profile/<login>")
+def view_profile_page(login):
+    if check_login(login):
+        user_metadata = session.query(Auth).filter_by(login=login).first()
+        return render_template("view_profile_page.html", profile=user_metadata)
+
+    return abort(404)
+
+
+@app.errorhandler(NotFound)
+def not_found_error(error):
+    return render_template('error.html', message="Страница не найдена", err_code=404, err=error), 404
+
+
+@app.errorhandler(InternalServerError)
+def internal_error(error):
+    session.rollback()
+    return render_template('error.html', message="Внутренняя ошибка сервера", err_code=500, err=error), 500
 
 #######################################################################################
 #        ___     ___    ___        _____                                              #
