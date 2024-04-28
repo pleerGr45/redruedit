@@ -1,13 +1,26 @@
 {% extends "base.html" %}
 {% block title %} Новости {% endblock %}
-{% block style %} 
+{% block style %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
 <link rel="stylesheet" href="{{url_for('static', filename='css/input_style.css')}}">
 <link rel="stylesheet" href="{{url_for('static', filename='css/text_area_style.css')}}">
+<style>
+    input[type="submit"] {
+        margin-bottom: 0px;
+    }
+</style>
 {% endblock %}
 {% block content %} 
-<form action="/" method="post">
+<form method="post">
     <input type="text" name="title" placeholder="Заголовок" maxlength="32" required>
     <textarea type="textarea" name="content" placeholder="Содержание" rows="4" maxlength="256" required></textarea>
     <input type="submit" value="Отправить">
 </form>
+{% for el in ls %}
+    <form>
+        <input type="text" name="ntitle" value="{{ el.title }}" maxlength="32" disabled>
+        <lable for="content">{{ el.post_owner }} | {{ el.date }}</lable>
+        <textarea type="textarea" name="content" rows="4" maxlength="256" disabled>{{ el.content }}</textarea>
+    </form>
+{% endfor %}
 {% endblock %}
