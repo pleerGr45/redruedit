@@ -53,6 +53,15 @@ class News(Base):
     content = Column(Text)
 
 
+class Message(Base):
+    __tablename__ = 'message'
+
+    id = Column(Integer, primary_key=True)
+    owner = Column(String)
+    date = Column(String)
+    message = Column(String)
+
+
 # Создание базы данных
 Base.metadata.create_all(engine)
 # Создание сессий
@@ -105,15 +114,20 @@ def load_user(user_id):
 def home_page():
     # Создание новости POST
     if request.method == 'POST':
+        user_metadata = session.query(Auth).filter_by(
+            id=current_user.get_id()).first()
         title = request.form['title']
-        post_owner = request.form['post_owner']
-        date = f"{datetime.now(pytz.timezone('Europe/Moscow')).today()}"
+        date = datetime.now(pytz.timezone('Europe/Moscow')).today()
         content = request.form['content']
-        session.add(News(title=title, post_owner=post_owner,
-                    date=date, content=content))
+        session.add(News(title=title, post_owner=user_metadata.login,
+                    date=date_format(date), content=content))
         session.commit()
+
+    ls = list(session.query(News).filter_by())
+    ls.reverse()
+
     # Загрузка шаблона home_page_html
-    return render_template("home_page.html")
+    return render_template("home_page.html", ls=ls)
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -165,9 +179,9 @@ def register_page():
                 # Генерация скрытого пароля
                 pass_hash = generate_password_hash(password)
                 # Отправка в базу данных
-                datedb = datetime.now(pytz.timezone('Europe/Moscow')).date()
+                datedb = datetime.now(pytz.timezone('Europe/Moscow')).today()
                 session.add(
-                    Auth(login=login, password=pass_hash, user_name=name, date_creation=f'{datedb.day}.{datedb.month}.{datedb.year}'))
+                    Auth(login=login, password=pass_hash, user_name=name, date_creation=date_format(datedb)))
                 session.commit()
                 # Отправка сообщения пользователю об успехе
                 flash('Вы успешно зарегистрированы', 'success')
@@ -184,10 +198,24 @@ def register_page():
     return render_template("register_page.html")
 
 
-@app.route("/community")
+@app.route("/community", methods=['GET', 'POST'])
 @login_required
 def community_page():
-    return render_template("community_page.html")
+    # Создание новости POST
+    if request.method == 'POST':
+        user_metadata = session.query(Auth).filter_by(
+            id=current_user.get_id()).first()
+        owner = user_metadata.login
+        date = datetime.now(pytz.timezone('Europe/Moscow')).today()
+        message = request.form['message']
+        session.add(
+            Message(owner=owner, date=date_format(date), message=message))
+        session.commit()
+
+    ls = list(session.query(Message).filter_by())
+    ls.reverse()
+
+    return render_template("community_page.html", ls=ls)
 
 
 @app.route("/contact_us")
@@ -227,7 +255,6 @@ def profile_page():
         user_metadata.user_phone = request.form['user_phone']
         user_metadata.user_about = request.form['user_about']
         user_metadata.user_birthdate = request.form['user_birthdate']
-        user_metadata.date_creation = request.form['date_creation']
 
     return render_template("profile_page.html", profile=user_metadata)
 
@@ -273,6 +300,13 @@ def check_login(login: str) -> bool:
       Так как login у авторизованного пользователя уникален, нужна функция, которая проверяет уникальность логина
     """
     return True if session.query(Auth).filter_by(login=login).first() else False
+
+
+def date_format(date) -> str:
+    """
+
+    """
+    return f"{date.year}-{date.month}-{date.day}"
 
 
 app.run(debug=True)

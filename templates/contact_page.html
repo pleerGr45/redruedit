@@ -10,31 +10,28 @@
 {% block content %} 
 <form>
     <div>
-        <label for="tg">Мы в телеграме</label>
-        <input type="text" name="tg" value="@dev777" disabled required>
+        <label for="tg">Телеграм</label>
+        <input type="text" name="tg" value="@dev777" disabled>
     </div>
     <div>
-        <label for="user_name">Имя пользователя</label>
-        <input type="text" name="user_name" value="{{profile.user_name}}" minlength="5" maxlength="32" required>
+        <label for="vk">ВК</label>
+        <input type="text" name="vk" value="vk.com/dev_7772134" disabled>
     </div>
     <div>
-        <label for="user_e_mail">Электронная почта</label>
-        <input type="email" name="user_e_mail" value="{% if profile.user_email != None %}{{profile.user_email}}{% endif %}" placeholder="user@example.com">
+        <label for="dev_e_mail">Электронная почта разработчика</label>
+        <input type="email" name="dev_e_mail" value="dev777_2134@mail.ru" disabled>
     </div>
     <div>
-        <label for="user_phone">Номер телефона</label>
-        <input type="tel" name="user_phone" pattern="[7]{1}-[0-9]{3}-[0-9]{3}-[0-9]{2}-[0-9]{2}" value="{% if profile.user_phone != None %}{{profile.user_phone}}{% endif %}" placeholder="7-XXX-XXX-XX-X">
+        <label for="dev_phone">Номер телефона разработчика</label>
+        <input type="tel" name="dev_phone" value="+7-888-777-21-34" disabled>
     </div>
     <div>
-        <label for="user_about">Информация о пользователе</label>
-        <textarea type="textarea" name="user_about" placeholder="Не указано" rows="4" maxlength="256">{% if profile.user_about %}{{profile.user_about}}{% endif %}</textarea>
+        <label for="admin_e_mail">Электронная почта администратора</label>
+        <input type="email" name="admin_e_mail" value="adm999_2134@mail.ru" disabled>
     </div>
     <div>
-        <label for="user_birthdate">День рождения</label>
-        <input type="date" name="user_birthdate" value="{{profile.user_birthdate}}" placeholder="Не указано">
+        <label for="admin_phone">Номер телефона аминистратора</label>
+        <input type="tel" name="admin_phone" value="+7-888-999-21-34" disabled>
     </div>
-    <div>
-        <label for="date_creation">Дата создания</label>
-        <input type="date" name="date_creation" value="{{profile.date_creation}}" placeholder="Не указано">
-    </div>
+</form>
 {% endblock %}
