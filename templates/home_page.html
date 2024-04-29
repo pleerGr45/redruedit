@@ -16,6 +16,10 @@
         text-align: center;
         cursor: pointer;
     }
+
+    .button {
+        padding: 3px;
+    }
 </style>
 {% endblock %}
 {% block content %}
@@ -38,10 +42,10 @@
             <btn>
                 <a href="like_news/{{el[0].id}}/+" class="likebutton">👍 <label>{{el[1]}}</label></a>
                 <a href="like_news/{{el[0].id}}/-" class="likebutton">👎 <label>{{el[2]}}</label></a>
-            </btn>
-            {% if rights %}
+                {% if rights %}
                 <a href="/delete_news/{{el[0].id}}" class="button">Удалить</a>
-            {% endif %}
+                {% endif %}
+            </btn>
         </form>
     {% endfor %}
 {% endif %}
