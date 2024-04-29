@@ -23,7 +23,7 @@
 {% block content %} 
 {% for el in ls %}
     <form>
-        <lable for="content">{{ el.owner }} | {{ el.date }}</lable>
+        <label for="message"><a href="/view_profile/{{el.owner}}">{{ el.owner }}</a> | {{ el.date }}</label>
         <input type="text" name="message" value="{{ el.message }}" maxlength="256" disabled>
     </form>
 {% endfor %}
