@@ -42,6 +42,7 @@ class Auth(Base):
     user_phone = Column(String)
     user_email = Column(String)
     admin_access = Column(Boolean, default=False)
+    status = Column(String, default="Пользователь")
 
 # Создание модели NEWS
 
@@ -109,12 +110,14 @@ def load_user(user_id):
 # Загрузка прав администраторов
 
 with open('admin_access.txt', 'r') as fr:
-    admin_list = fr.read().split(',')
+    admin_list = fr.read().split('\n')
 
 for admin in admin_list:
-    user = session.query(Auth).filter_by(login=admin).first()
+    inf = admin.split(':')
+    user = session.query(Auth).filter_by(login=inf[0]).first()
     if user:
         user.admin_access = True
+        user.status = inf[1]
 
 session.commit()
 
@@ -138,14 +141,14 @@ def home_page():
 
         # Получение данных из формы
         title = request.form['title']
-        date = datetime.now(pytz.timezone('Europe/Moscow')).today()
+        date = datetime.now(pytz.timezone('Europe/Moscow'))
         file_image = request.files['photo']
         # Сохранение изображения
         file_image.save('static/images/'+file_image.filename)
         content = request.form['content']
 
         # Добавление новости
-        session.add(News(title=title, date=date_format(
+        session.add(News(title=title, date=date_news_format(
             date), image=file_image.filename, content=content, likes=""))
         session.commit()
 
@@ -213,7 +216,7 @@ def register_page():
                 # Генерация скрытого пароля
                 pass_hash = generate_password_hash(password)
                 # Отправка в базу данных
-                datedb = datetime.now(pytz.timezone('Europe/Moscow')).today()
+                datedb = datetime.now(pytz.timezone('Europe/Moscow'))
                 session.add(
                     Auth(login=login, password=pass_hash, user_name=name, date_creation=date_format(datedb)))
                 session.commit()
@@ -428,6 +431,43 @@ def date_format(date) -> str:
     Добавляет ноль перед числом месяца или дня, если это число < 10
     """
     return "{}-{:02}-{:02}".format(date.year, date.month, date.day)
+
+
+def date_news_format(date) -> str:
+    """
+    Метод date_news_format
+    Возвращает время в формате: гг-мм-дд
+    Добавляет ноль перед числом месяца или дня, если это число < 10
+    """
+    return "{:02} ".format(date.day) + parse_str_month(date.month) + " {} {:02}:{:02}".format(date.year, date.hour, date.minute)
+
+
+def parse_str_month(month: int) -> str:
+    match month:
+        case 1:
+            return "ЯНВ"
+        case 2:
+            return "ФЕВ"
+        case 3:
+            return "МАР"
+        case 4:
+            return "АПР"
+        case 5:
+            return "МАЙ"
+        case 6:
+            return "ИЮН"
+        case 7:
+            return "ИЮЛ"
+        case 8:
+            return "АВГ"
+        case 9:
+            return "СЕН"
+        case 10:
+            return "ОКТ"
+        case 11:
+            return "НОЯ"
+        case 12:
+            return "ДЕК"
 
 
 # Запуск flask приложения
