@@ -4,23 +4,45 @@
 <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
 <link rel="stylesheet" href="{{url_for('static', filename='css/input_style.css')}}">
 <link rel="stylesheet" href="{{url_for('static', filename='css/text_area_style.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/image.css')}}">
 <style>
-    input[type="submit"] {
-        margin-bottom: 0px;
+    .likebutton {
+        padding: 3px;
+        border: none;
+        border-radius: 10px;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        margin-right: 30px;
+        text-decoration: none;
+        text-align: center;
+        cursor: pointer;
     }
 </style>
 {% endblock %}
-{% block content %} 
-<form method="post">
+{% block content %}
+{% if rights %}
+<form method="post" enctype="multipart/form-data">
     <input type="text" name="title" placeholder="Заголовок" maxlength="32" required>
+    <label for="photo">Загрузить фото</label>
+    <input type="file" name="photo" accept="image/png,image/jpeg">
     <textarea type="textarea" name="content" placeholder="Содержание" rows="4" maxlength="256" required></textarea>
     <input type="submit" value="Отправить">
 </form>
-{% for el in ls %}
-    <form>
-        <input type="text" name="ntitle" value="{{ el.title }}" maxlength="32" disabled>
-        <lable for="content">{{ el.post_owner }} | {{ el.date }}</lable>
-        <textarea type="textarea" name="content" rows="4" maxlength="256" disabled>{{ el.content }}</textarea>
-    </form>
-{% endfor %}
+{% endif %}
+{% if is_not_void %}
+    {% for el in ls %}
+        <form>
+            <input type="text" name="ntitle" value="{{ el[0].title }}" maxlength="32" disabled>
+            <label for="content">{{ el[0].date }}</label>
+            <img src="static/images/{{el[0].image}}">
+            <textarea type="textarea" name="content" rows="4" maxlength="256" disabled>{{ el[0].content }}</textarea>
+            <btn>
+                <a href="like_news/{{el[0].id}}/+" class="likebutton">👍 <label>{{el[1]}}</label></a>
+                <a href="like_news/{{el[0].id}}/-" class="likebutton">👎 <label>{{el[2]}}</label></a>
+            </btn>
+            {% if rights %}
+                <a href="/delete_news/{{el[0].id}}" class="button">Удалить</a>
+            {% endif %}
+        </form>
+    {% endfor %}
+{% endif %}
 {% endblock %}
