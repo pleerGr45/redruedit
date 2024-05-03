@@ -28,8 +28,6 @@ engine = create_engine('sqlite:///database.db')
 Base = declarative_base()
 
 # Создание модели AUTH
-
-
 class Auth(Base):
     __tablename__ = 'authorized_users'
     id = Column(Integer, primary_key=True)
@@ -43,29 +41,41 @@ class Auth(Base):
     user_email = Column(String)
     admin_access = Column(Boolean, default=False)
     status = Column(String, default="Пользователь")
+    has_communty = Column(String, nullable=True)
 
 # Создание модели NEWS
-
-
 class News(Base):
     __tablename__ = 'news'
 
     id = Column(Integer, primary_key=True)
-    title = Column(String)
-    date = Column(String)
+    title = Column(String, nullable=False)
+    date = Column(String, nullable=False)
     image = Column(String, nullable=True)
-    content = Column(String)
+    content = Column(String, nullable=False)
     likes = Column(String, nullable=True)
 
-
-class Message(Base):
-    __tablename__ = 'message'
+# Создание модели COMMUNITY
+class Community(Base):
+    __tablename__ = 'community'
 
     id = Column(Integer, primary_key=True)
-    owner = Column(String)
-    date = Column(String)
-    message = Column(String)
+    unique_name = Column(String, nullable=False, unique=True)
+    owner = Column(String, nullable=False)
+    com_name = Column(String, nullable=False)
+    com_description = Column(String, nullable=False)
+    date_creation = Column(String, nullable=False)
+    chat_list = Column(String, nullable=True)
 
+# Создание модели CHAT
+class Chat(Base):
+    __tablename__ = 'chat'
+
+    id = Column(Integer, primary_key=True)
+    parrent_unique_name = Column(String, nullable=False)
+    chat_name = Column(String, nullable=False)
+    chat_description = Column(String, nullable=True)
+    date_creation = Column(String, nullable=False)
+    messages = Column(String, nullable=False)
 
 # Создание базы данных
 Base.metadata.create_all(engine)
@@ -74,8 +84,6 @@ session = sessionmaker(bind=engine)()
 session.rollback()
 
 # Создание класса пользователя
-
-
 class UserLogin():
     def fromDB(self, user_id):
         self.__user = session.query(Auth).filter_by(id=user_id)
@@ -100,15 +108,12 @@ class UserLogin():
         return self.__id
 
 # Обработчик загрузок пользователей
-
-
 @login_manager.user_loader
 def load_user(user_id):
     return UserLogin().fromDB(user_id)
 
 
 # Загрузка прав администраторов
-
 with open('admin_access.txt', 'r') as fr:
     admin_list = fr.read().split('\n')
 
@@ -129,12 +134,11 @@ session.commit()
 #                                                                                     #
 #######################################################################################
 
-
+# ------------ Обработка пути '/' ------------ 
 @app.route("/", methods=['GET', 'POST'])
 def home_page():
     # Получение двнных о пользователе
-    user_metadata = session.query(Auth).filter_by(
-        id=current_user.get_id()).first()
+    user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
 
     # Создание новости POST (с доступом администратора)
     if request.method == 'POST' and user_metadata.admin_access:
@@ -148,8 +152,7 @@ def home_page():
         content = request.form['content']
 
         # Добавление новости
-        session.add(News(title=title, date=date_news_format(
-            date), image=file_image.filename, content=content, likes=""))
+        session.add(News(title=title, date=date_news_format(date), image=file_image.filename, content=content, likes=""))
         session.commit()
 
     # Получение данных о новостях
@@ -166,6 +169,7 @@ def home_page():
     return render_template("home_page.html", ls=ls, is_not_void=len(ls), rights=rights)
 
 
+# ------------ Обработка пути '/login' ------------ 
 @app.route("/login", methods=['GET', 'POST'])
 def login_page():
     # Если пользователь уже авторизован
@@ -177,8 +181,7 @@ def login_page():
     if request.method == 'POST':
 
         # Получение получение пользователя по логину
-        user = session.query(Auth).filter_by(
-            login=request.form['login']).first()
+        user = session.query(Auth).filter_by(login=request.form['login']).first()
 
         # Проверка на существование пользователя, на сходство паролей
         if user and check_password_hash(user.password, request.form['pass']):
@@ -196,7 +199,7 @@ def login_page():
     # Возврат шаблона login_page.html
     return render_template("login_page.html")
 
-
+# ------------ Обработка пути '/register' ------------ 
 @app.route("/register", methods=['GET', 'POST'])
 def register_page():
     # Если POST запрос
@@ -217,8 +220,7 @@ def register_page():
                 pass_hash = generate_password_hash(password)
                 # Отправка в базу данных
                 datedb = datetime.now(pytz.timezone('Europe/Moscow'))
-                session.add(
-                    Auth(login=login, password=pass_hash, user_name=name, date_creation=date_format(datedb)))
+                session.add(Auth(login=login, password=pass_hash, user_name=name, date_creation=date_format(datedb)))
                 session.commit()
                 # Отправка сообщения пользователю об успехе
                 flash('Вы успешно зарегистрированы', 'success')
@@ -234,39 +236,115 @@ def register_page():
     # Возврат шаблона register_page.html
     return render_template("register_page.html")
 
-
+# ------------ Обработка пути '/community' ------------ 
 @app.route("/community", methods=['GET', 'POST'])
 @login_required
 def community_page():
     # Создание новости POST
+    #if request.method == 'POST':
+        #user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
+        #owner = user_metadata.login
+        #date = datetime.now(pytz.timezone('Europe/Moscow')).today()
+        #message = request.form['message']
+        #session.add(Message(owner=owner, date=date_format(date), message=message))
+        #session.commit()
+
+    #ls = list(session.query(Message).filter_by())
+    #ls.reverse()
+
+    return render_template("community_page.html")
+
+# ------------ Обработка пути '/community/center/<unique_name>' ------------ 
+@app.route("/community/center/<unique_name>", methods=['GET', 'POST'])
+@login_required
+def community_center_page(unique_name: str):
+    # Если метод POST
     if request.method == 'POST':
-        user_metadata = session.query(Auth).filter_by(
-            id=current_user.get_id()).first()
-        owner = user_metadata.login
-        date = datetime.now(pytz.timezone('Europe/Moscow')).today()
-        message = request.form['message']
-        session.add(
-            Message(owner=owner, date=date_format(date), message=message))
-        session.commit()
+        user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
+   
+    return redirect('/')
 
-    ls = list(session.query(Message).filter_by())
-    ls.reverse()
+# ------------ Обработка пути '/community/center/<unique_name>/<chat_name>' ------------ 
+@app.route("/community/center/<unique_name>/<chat_name>", methods=['GET', 'POST'])
+@login_required
+def community_chat_page(unique_name: str, chat_name: str):
+    # Если метод POST
+    if request.method == 'POST':
+        user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
 
-    return render_template("community_page.html", ls=ls)
+    return redirect('/')
 
+# ------------ Обработка пути '/community/create' ------------ 
+@app.route("/community/create", methods=['GET', 'POST'])
+@login_required
+def community_create_page():
+    # Если метод POST
+    if request.method == 'POST':
+        
+        # Получение данных о пользователе
+        user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
+        
+        # Получение данных из формы
+        com_unique_name = request.form['com_unique_name']
+        com_name = request.form['com_name']
+        com_desc = request.form['com_desc']
+        
+        # Проверка на возможность создания сообщества
+        if not user_metadata.has_communty:
+            if not check_unique_name(com_unique_name):
+                # Добавление сообщества в БД
+                datedb = datetime.now(pytz.timezone('Europe/Moscow'))
+                session.add(Community(owner=user_metadata.login, unique_name=com_unique_name, com_name=com_name, com_description=com_desc, date_creation=date_format(datedb)))
+                
+                # Присвоение сообщества пользователю
+                user_metadata.has_communty = com_unique_name;
+                session.commit()
 
+                # Переход на страницу редактирования
+                return redirect('/community/edit')
+            else:
+                # Отправка сообщения пользователю о том, что такое уникальное имя уже занято
+                flash('Такое уникальное имя сообщества уже занято', 'warning')
+        else:
+            # Отправка сообщения пользователю о том, что он уже является владельцем сообщества
+            flash('Нельзя уметь более двух сообществ', 'info')
+    
+    # Возврат шаблона community_create_page.html
+    return render_template('community_create_page.html')
+
+# ------------ Обработка пути '/community/edit' ------------ 
+@app.route("/community/edit", methods=['GET', 'POST'])
+@login_required
+def community_edit_page():
+    # Получение данных о пользователе
+    user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
+
+    # Получение данных о сообществе
+    community = session.query(Community).filter_by(unique_name=user_metadata.has_communty).first()
+
+    # Если метод POST
+    if request.method == 'POST':
+        # ,
+        community.com_name = request.form['com_name']
+        community.com_description = request.form['com_desc']
+    
+    # Возврать шаблона community_edit_page.html
+    return render_template('community_edit_page.html')
+    
+
+# ------------ Обработка пути '/contact_us' ------------ 
 @app.route("/contact_us")
 def contact_page():
     # Возврат шаблона contact_page.html
     return render_template("contact_page.html")
 
-
+# ------------ Обработка пути '/about_us' ------------ 
 @app.route("/about_us")
 def about_page():
     # Возврат шаблона about_page.html
     return render_template("about_page.html")
 
-
+# ------------ Обработка пути '/logout' ------------ 
 @app.route("/logout")
 def logout_page():
     # Выход из системы
@@ -276,7 +354,7 @@ def logout_page():
     # Перенаправление на /login
     return redirect(url_for('login_page'))
 
-
+# ------------ Обработка пути '/profile' ------------ 
 @app.route("/profile", methods=['GET', 'POST'])
 @login_required
 def profile_page():
@@ -297,7 +375,7 @@ def profile_page():
     # Возврат шаблона profile_page.html
     return render_template("profile_page.html", profile=user_metadata)
 
-
+# ------------ Обработка пути '/view_profile/<login>' ------------ 
 @app.route("/view_profile/<login>")
 def view_profile_page(login):
     # Если логин существует
@@ -310,7 +388,7 @@ def view_profile_page(login):
     # Иначе ошибка 404 NotFoundError
     return abort(404)
 
-
+# ------------ Обработка пути '/delete' ------------ 
 @app.route("/delete")
 def delete_page():
     # Данные о пользователе
@@ -334,7 +412,7 @@ def delete_page():
     # Возврат на '/login'
     return redirect(url_for('login_page'))
 
-
+# ------------ Обработка пути '/delete_news/<id>' ------------ 
 @app.route("/delete_news/<id>")
 def delete_news_page(id):
     # Получение данных о новости
@@ -354,7 +432,7 @@ def delete_news_page(id):
     # Перенаправление на главную страницу /
     return redirect(url_for('home_page'))
 
-
+# ------------ Обработка пути '/like_news/<id>/<like>' ------------ 
 @app.route("/like_news/<id>/<like>")
 def like_news_page(id, like):
     # Получение данных о новости
@@ -383,13 +461,13 @@ def like_news_page(id, like):
     # Перенаправление на главную страницу /
     return redirect(url_for('home_page'))
 
-
+# ------------ Обработка ошибки 404 ------------ 
 @app.errorhandler(NotFound)
 def not_found_error(error):
     # Возврат шаблона error.html с кодом ошибки 404
     return render_template('error.html', message="Страница не найдена", err_code=404, err=error), 404
 
-
+# ------------ Обработка ошибки 500 ------------ 
 @app.errorhandler(InternalServerError)
 def internal_error(error):
     # Устранение ошибки сессии
@@ -406,8 +484,6 @@ def internal_error(error):
 #######################################################################################
 
 # Метод проверки существования логина
-
-
 def check_login(login: str) -> bool:
     """
     Метод check_login
@@ -420,10 +496,11 @@ def check_login(login: str) -> bool:
     """
     return True if session.query(Auth).filter_by(login=login).first() else False
 
+# Метод проверки существования уникального имени
+def check_unique_name(unique_name: str) -> bool:
+    return True if session.query(Community).filter_by(unique_name=unique_name).first() else False
 
 # Метод форматирования даты
-
-
 def date_format(date) -> str:
     """
     Метод date_format
@@ -432,7 +509,7 @@ def date_format(date) -> str:
     """
     return "{}-{:02}-{:02}".format(date.year, date.month, date.day)
 
-
+# Метод форматирования даты для новостей
 def date_news_format(date) -> str:
     """
     Метод date_news_format
@@ -441,7 +518,7 @@ def date_news_format(date) -> str:
     """
     return "{:02} ".format(date.day) + parse_str_month(date.month) + " {} {:02}:{:02}".format(date.year, date.hour, date.minute)
 
-
+# Метод Преобразования номера месяца в тестовый формат
 def parse_str_month(month: int) -> str:
     match month:
         case 1:

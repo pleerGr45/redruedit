@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{% endblock %}
+
+{% block style %}
+<style>
+    base_content_pane {
+        display: flex;
+        flex-direction: row;
+    }
+
+    menu {
+        display: flex;
+        flex-direction: column;
+    }
+
+</style>
+{% block cmstyle %} {% endblock %}
+{% endblock %}
+
+{% block content %}
+<base_content_pane>
+    <menu>
+        {% for chat in chats %}
+            <li><a href="/community/center/root/{{chat.name}}">{{chat.name}}</a></li> 
+        {% endfor %}
+        <hr>
+        {% for cm in communities %}
+            <li><a href="/community/center/{{cm.unique_name}}">{{cm.unique_name}}</a></li> 
+        {% endfor %}
+    </menu>
+    <container>
+        {% block container %}{% endblock %}
+    </container>
+</base_content_pane>
+
+{% endblock %}
