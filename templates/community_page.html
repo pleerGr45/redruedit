@@ -1,35 +1,14 @@
-{% extends "base.html" %}
+{% extends "community_base.html" %}
 {% block title %} Сообщество {% endblock %}
-{% block style %} 
-<link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
-<link rel="stylesheet" href="{{url_for('static', filename='css/input_style.css')}}">
+{% block cmstyle %} 
 <style>
-    form {
-        display: flex;
-        flex-direction: row;
-        width: 400px;
-        margin: 20px auto;
-        background-color: #f5f5f5;
-        padding: 20px;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-    input[type="text"],
-    input[type="submit"] {
-        margin-bottom: 0px;
-    }
+
 </style>
 {% endblock %}
-{% block content %} 
-{% for el in ls %}
-    <form>
-        <label for="message"><a href="/view_profile/{{el.owner}}">{{ el.owner }}</a> | {{ el.date }}</label>
-        <input type="text" name="message" value="{{ el.message }}" maxlength="256" disabled>
-    </form>
-{% endfor %}
-    <hr>
-    <form method="post">
-        <input type="text" name="message" placeholder="Сообщение" maxlength="256" required>
-        <input type="submit" value="Отправить">
-    </form>
+{% block container %}
+<form action="{{url_for('community_center_page')}}" method="get">
+    <div>
+        ROOT-СООБЩЕСТВО
+    </div>
+</form>
 {% endblock %}

@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block title %}{% endblock %}
-
 {% block style %}
+<link rel="stylesheet" href="{{url_for('static', filename='css/input_style.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/text_area_style.css')}}">
 <style>
     base_content_pane {
         display: flex;
@@ -11,6 +12,10 @@
     menu {
         display: flex;
         flex-direction: column;
+    }
+
+    container {
+        flex: auto;
     }
 
 </style>

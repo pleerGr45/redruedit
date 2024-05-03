@@ -237,32 +237,28 @@ def register_page():
     return render_template("register_page.html")
 
 # ------------ Обработка пути '/community' ------------ 
-@app.route("/community", methods=['GET', 'POST'])
+@app.route("/community")
 @login_required
 def community_page():
-    # Создание новости POST
-    #if request.method == 'POST':
-        #user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
-        #owner = user_metadata.login
-        #date = datetime.now(pytz.timezone('Europe/Moscow')).today()
-        #message = request.form['message']
-        #session.add(Message(owner=owner, date=date_format(date), message=message))
-        #session.commit()
+    # Список случайных 20 сообществ
+    communities = session.query(Community).all()
 
-    #ls = list(session.query(Message).filter_by())
-    #ls.reverse()
+    # Получение данных о главном сообществе основных чатов (root-сообщество)
+    community = session.query(Community).filter_by(unique_name="root").first()
 
-    return render_template("community_page.html")
+    return render_template("community_page.html", chats=get_chats(community.chat_list), communities=communities)
 
 # ------------ Обработка пути '/community/center/<unique_name>' ------------ 
-@app.route("/community/center/<unique_name>", methods=['GET', 'POST'])
+@app.route("/community/center/<unique_name>")
 @login_required
 def community_center_page(unique_name: str):
-    # Если метод POST
-    if request.method == 'POST':
-        user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
-   
-    return redirect('/')
+    user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
+
+    # Получение данных о сообществе
+    community = session.query(Community).filter_by(unique_name=unique_name).first()
+    
+    # Возврат шаблона community_center_page.html
+    return render_template('community_center_page.html', community=community)
 
 # ------------ Обработка пути '/community/center/<unique_name>/<chat_name>' ------------ 
 @app.route("/community/center/<unique_name>/<chat_name>", methods=['GET', 'POST'])
@@ -301,7 +297,7 @@ def community_create_page():
                 session.commit()
 
                 # Переход на страницу редактирования
-                return redirect('/community/edit')
+                return redirect(url_for('community_edit_page'))
             else:
                 # Отправка сообщения пользователю о том, что такое уникальное имя уже занято
                 flash('Такое уникальное имя сообщества уже занято', 'warning')
@@ -319,18 +315,133 @@ def community_edit_page():
     # Получение данных о пользователе
     user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
 
-    # Получение данных о сообществе
-    community = session.query(Community).filter_by(unique_name=user_metadata.has_communty).first()
+    # Проверка на существование сообщества
+    if user_metadata.has_communty:
+        # Получение данных о сообществе
+        community = session.query(Community).filter_by(unique_name=user_metadata.has_communty).first()
 
+        # Если метод POST
+        if request.method == 'POST':
+            # Получение данных с формы и перезапись в БД
+            community.com_name = request.form['com_name']
+            community.com_description = request.form['com_desc']
+        
+        # Отправка сообщения пользователю об успехе редактирования
+        flash(f'Соообщество {community.unique_name} был успешно отредактирован', 'success')
+
+        # Возврать шаблона community_edit_page.html
+        return render_template('community_edit_page.html', community=community)
+    
+    # Отправка сообщения пользователю о том, что он не имеет сообщества
+    flash('Для начала вам необходимо создать сообщество', 'info')
+    # Перенаправление на /community/create
+    return redirect(url_for('community_create_page'))
+
+# ------------ Обработка пути '/community/delete' ------------ 
+@app.route("/community/delete")
+@login_required
+def community_delete_page():
+
+    # Отправка сообщения пользователю об удалении сообщества
+    flash('Сообщество удалено', 'error')
+    # Перенаправление на /community
+    return redirect('community_page.html')
+
+# ------------ Обработка пути '/community/create_chat' ------------ 
+@app.route("/community/create_chat", methods=['GET', 'POST'])
+@login_required
+def community_create_chat_page():
     # Если метод POST
     if request.method == 'POST':
-        # ,
-        community.com_name = request.form['com_name']
-        community.com_description = request.form['com_desc']
+        
+        # Получение данных о пользователе
+        user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
+
+        # Проверка на наличие сообщества у пользователя
+        if user_metadata.has_communty:
+            # Получние данных о сообществе  
+            community = session.query(Community).filter_by(unique_name=user_metadata.has_communty).first()
+
+            # Получение данных из формы
+            chat_name = request.form['chat_name']
+            chat_desc = request.form['chat_desc']
+        
+            if community.chat_list and not community.chat_list.contains(chat_name):
+                # Добавление чата в БД
+                datedb = datetime.now(pytz.timezone('Europe/Moscow'))
+                session.add(Chat(parrent_unique_name=community.unique_name, chat_name=chat_name, chat_description=chat_desc, date_creation=date_format(datedb)))
+                
+                # Присвоение чата сообществу 
+                community.chat_list += f'{chat_name},';
+                session.commit()
+
+                # Отправка сообщения пользователю о том, что чат успешно создан
+                flash('Чат успешно создан', 'success')
+            else:
+                # Отправка сообщения пользователю о том, что такое уникальное имя уже занято
+                flash('Такое название чата в данном сообществе уже существует', 'warning')
+        else:
+            # Отправка сообщения пользователю о том, что он не имеет сообщества
+            flash('Для начала вам необходимо создать сообщество', 'info')
+            # Перенаправление на /community/create
+            return redirect(url_for('community_create_page'))
     
-    # Возврать шаблона community_edit_page.html
-    return render_template('community_edit_page.html')
+    # Возврат шаблона community_create_chat_page.html
+    return render_template('community_create_chat_page.html')
+
+# ------------ Обработка пути '/community/edit_chat' ------------ 
+@app.route("/community/edit_chat", methods=['GET', 'POST'])
+@login_required
+def community_edit_chat_page():
+    # Получение данных о пользователе
+    user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
+    # Если метод POST
+    if request.method == 'POST':
+        if user_metadata.has_communty:
+            # Получение данных о сообществе
+            community = session.query(Community).filter_by(unique_name=user_metadata.has_communty).first()
+
+            # Получение данных с формы и перезапись в БД
+            community.com_name = request.form['com_name']
+            community.com_description = request.form['com_desc']
+        else:
+            # Отправка сообщения пользователю о том, что он не имеет сообщества
+            flash('Для начала вам необходимо создать сообщество', 'info')
+            # Перенаправление на /community/create
+            return redirect(url_for('community_create_page'))
+
+    # Возврат шаблона community_edit_chat_page.html
+    return render_template('community_edit_chat_page.html')
+
+# ------------ Обработка пути '/community/delete_chat/<chat_name>' ------------ 
+@app.route("/community/delete_chat/<chat_name>")
+@login_required
+def community_delete_chat_page(chat_name):
+    # Получение данных о пользователе
+    user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
+
+    if user_metadata.has_communty:
+        # Получние данных о сообществе  
+        community = session.query(Community).filter_by(unique_name=user_metadata.has_communty).first()
+
+        if community.chat_list and community.chat_list.contains(chat_name):
+            # Удаление чата из БД
+            session.delete(session.query(Chat).filter_by(parrent_unique_name=community.unique_name, chat_name=chat_name).first())
+
+            # Удаление ссылки чата из сообщества
+            community.chat_list.replace(f'{chat_name},', '')
+            session.commit()
+        else:
+            # Отправка сообщения пользователю о том, что данный чат не обнаружен
+            flash('Данный чат не обнаружен', 'error')
+    else:
+        # Отправка сообщения пользователю о том, что он не имеет сообщества
+        flash('Для начала вам необходимо создать сообщество', 'info')
+        # Перенаправление на /community/create
+        return redirect(url_for('community_create_page'))
     
+    # Перенаправление на /community/edit
+    return redirect(url_for('community_edit_page'))
 
 # ------------ Обработка пути '/contact_us' ------------ 
 @app.route("/contact_us")
@@ -546,6 +657,13 @@ def parse_str_month(month: int) -> str:
         case 12:
             return "ДЕК"
 
+# Метод разделения строки чатов на список имён чатов
+def get_chats(chat_list: str) -> list[str]:
+    """
+    """
+    chats=chat_list.split(',')
+    chats.remove('')
+    return chats
 
 # Запуск flask приложения
 app.run(debug=True)

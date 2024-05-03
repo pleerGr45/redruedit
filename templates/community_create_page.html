@@ -1,0 +1,15 @@
+{% extends "community_base.html" %}
+{% block title %} Создание сообщества {% endblock %}
+{% block cmstyle %} 
+<style>
+
+</style>
+{% endblock %}
+{% block container %}
+<form action="{{url_for('community_create_page')}}" method="post">
+    <input type="text" name="com_unique_name" placeholder="Уникальное имя сообщества" minlength="4" maxlength="32" required>
+    <input type="text" name="com_name" placeholder="Отображаемое имя сообщества" minlength="4" maxlength="32" required>
+    <textarea type="textarea" name="com_desc" placeholder="Описание сообщества" rows="4" maxlength="256"></textarea>
+    <input type="submit" value="Сохранить">
+</form>
+{% endblock %}
