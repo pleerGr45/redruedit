@@ -2,14 +2,52 @@
 {% block title %} Сообщество {{community.unique_name}} {% endblock %}
 {% block cmstyle %} 
 <style>
+    .smallbutton {
+        padding: 3px;
+        border: none;
+        border-radius: 10px;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        margin-right: 5px;
+        text-decoration: none;
+        text-align: center;
+        cursor: pointer;
+    }
 
+    .createbutton {
+        padding: 3px;
+        color: #20ac2c;
+        border: 1px solid #20ac2c;
+        border-radius: 3px;
+        background-color: #f5f5f5;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        margin-right: 20px;
+        text-decoration: none;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .createbutton:hover,
+    .createbutton:focus {
+        color: #fff;
+        background-color: #197521;
+        border-color: #197521;
+    }
+
+    label {
+        margin-right: 5px;
+    }
+    
 </style>
 {% endblock %}
 {% block container %}
-<form action="{{url_for('community_create_page')}}" method="post">
+<form action="{{url_for('community_edit_page')}}" method="post">
     <div>
         <label for="com_unique_name">Уникальное имя</label>
         <input type="text" name="com_unique_name" value="{{community.unique_name}}" disabled>
+    </div>
+    <div>
+        <label for="com_owner">Владелец</label>
+        <input type="text" name="com_owner" value="{{community.owner}}" disabled>
     </div>
     <div>
         <label for="com_name">Отображаемое имя</label>
@@ -24,5 +62,21 @@
         <input type="date" name="date_creation" value="{{community.date_creation}}" placeholder="Не указано" disabled>
     </div>
     <input type="submit" value="Сохранить">
+    <hr>
+    <btn>
+        <a href="{{url_for('community_create_chat_page')}}" class="createbutton">Создать чат</a>
+    </btn>
+    {% for com_chat in com_chats %}
+    <hr>
+    <btn>
+        <label>{{com_chat}}</label>
+        <a href="/community/edit_chat/{{com_chat}}" class="smallbutton">✎</a>
+        <a href="/community/delete_chat/{{com_chat}}" class="smallbutton">🗑️</a>
+    </btn>
+    {% endfor %}
+    <hr>
+    <btn>
+        <a href="{{url_for('community_delete_page')}}" class="button">Удалить сообщество</a>
+    </btn>
 </form>
 {% endblock %}

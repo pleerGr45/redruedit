@@ -26,11 +26,11 @@
 <base_content_pane>
     <menu>
         {% for chat in chats %}
-            <li><a href="/community/center/root/{{chat.name}}">{{chat.name}}</a></li> 
+            <li><a href="/community/center/root/{{chat}}">{{chat}}</a></li> 
         {% endfor %}
         <hr>
         {% for cm in communities %}
-            <li><a href="/community/center/{{cm.unique_name}}">{{cm.unique_name}}</a></li> 
+            <li><a href="/community/center/{{cm.unique_name}}">{{cm.com_name}}#{{cm.unique_name}}</a></li> 
         {% endfor %}
     </menu>
     <container>

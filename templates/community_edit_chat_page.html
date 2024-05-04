@@ -1,0 +1,30 @@
+{% extends "community_base.html" %}
+{% block title %} Чат {{chat.chat_name}} {% endblock %}
+{% block cmstyle %} 
+<style>
+
+</style>
+{% endblock %}
+{% block container %}
+<form action="/community/edit_chat/{{chat_format_name}}" method="post">
+    <div>
+        <label for="parrent_unique_name">Сообщество</label>
+        <input type="text" name="parrent_unique_name" value="{{chat.parrent_unique_name}}" disabled>
+    </div>
+    <div>
+        <label for="chat_name">Имя чата</label>
+        <input type="text" name="chat_name" value="{{chat_format_name}}" placeholder="Не указано" minlength="4" maxlength="32" required>
+    </div>
+    <div>
+        <label for="chat_desc">Описание чата</label>
+        <textarea type="textarea" name="chat_desc" placeholder="Не указано" rows="4" maxlength="512">{{chat.chat_description}}</textarea>
+    </div>
+    <div>
+        <label for="date_creation">Дата создания</label>
+        <input type="date" name="date_creation" value="{{chat.date_creation}}" placeholder="Не указано" disabled>
+    </div>
+    <input type="submit" value="Сохранить">
+    <hr>
+    <a href="{{url_for('community_edit_page')}}">Назад</a>
+</form>
+{% endblock %}
