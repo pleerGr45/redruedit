@@ -243,8 +243,8 @@ def register_page():
 @app.route("/community")
 @login_required
 def community_page():
-
-    return render_template("community_page.html", chats=get_root_chats(), communities=get_communities())
+    # Возврат шаблона community_page.html
+    return render_template("community_page.html", community=session.query(Community).filter_by(unique_name='root').first(), chats=get_root_chats(), communities=get_communities())
 
 # ------------ Обработка пути '/community/center/<unique_name>' ------------ 
 @app.route("/community/center/<unique_name>")
@@ -282,7 +282,10 @@ def community_chat_page(unique_name: str, chat_name: str):
 
         msgs = []
 
-        for msg in chat.messages.split('^'):
+        messages_combined = chat.messages.split('^')
+        messages_combined.remove('')
+        
+        for msg in messages_combined:
             msgs.append(msg.split('|'))
 
         return render_template('community_chat_page.html', chats=get_root_chats(), communities=get_communities(), chat_name=chat_name, chat=chat, messages=msgs)
@@ -295,9 +298,6 @@ def community_chat_page(unique_name: str, chat_name: str):
 def community_create_page():
     # Если метод POST
     if request.method == 'POST':
-        # Список сообществ
-        communities = session.query(Community).all()
-        
         # Получение данных о пользователе
         user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
         
@@ -328,7 +328,7 @@ def community_create_page():
             flash('Нельзя уметь более двух сообществ', 'info')
     
     # Возврат шаблона community_create_page.html
-    return render_template('community_create_page.html', chats=get_root_chats(), communities=get_communities())
+    return render_template('community_create_page.html', chats="", communities=get_communities())
 
 # ------------ Обработка пути '/community/edit' ------------ 
 @app.route("/community/edit", methods=['GET', 'POST'])
@@ -761,7 +761,8 @@ def get_communities():
 # Функция получения списка root-чатов
 def get_root_chats():
     # Возврат списка названий root-чатов
-    return get_chats(session.query(Community).filter_by(unique_name="root").first().chat_list.replace('<', '').replace('>', ''))
+    chats = get_chats(session.query(Community).filter_by(unique_name="root").first().chat_list.replace('<', '').replace('>', ''))
+    return chats if chats else ""
 
 # Запуск flask приложения
 app.run(debug=True)

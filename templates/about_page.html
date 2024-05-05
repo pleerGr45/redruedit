@@ -1,10 +1,28 @@
 {% extends "base.html" %}
 {% block title %} Информация {% endblock %}
 {% block style %} 
+<link rel="stylesheet" href="{{url_for('static', filename='css/input_style.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/text_area_style.css')}}">
 <style>
-
+    div, textarea {
+        margin-top: 15px;
+    }
 </style>
 {% endblock %}
 {% block content %} 
-О нас
+<form>
+    <div>
+        <label for="dev">Разработчик</label>
+        <input type="text" name="dev" value="Матвеев Владислав Александрович | Ученик IT-школы 'Gendalf' - @dev777" disabled>
+    </div>
+    <a href="/view_profile/dev777">Профиль разработчика</a>
+    <div>
+        <label for="adm">Администратор</label>
+        <input type="text" name="adm" value="Второй аккаунт разработчика - @adm777" disabled>
+    </div>
+    <a href="/view_profile/adm777">Профиль администратора</a>
+    <textarea type="textarea" name="desc" placeholder="Описание чата" rows="3" disabled>!!! Предупреждение !!! У разработчка нет раздвоения личности, два аккаунта были созданы с целью разделения прав</textarea>
+    <input type="email" name="contact" value="Задать воопрос - страница 'Контакты'" disabled>
+    <a href="/contact_us">Связаться с нами</a>
+</form>
 {% endblock %}

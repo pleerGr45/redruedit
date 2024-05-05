@@ -2,13 +2,29 @@
 {% block title %} Сообщество {% endblock %}
 {% block cmstyle %} 
 <style>
+    form {
+        width: 60%;
+    }
 
 </style>
 {% endblock %}
 {% block container %}
 <form action="{{url_for('community_page')}}" method="get">
     <div>
-        ROOT-СООБЩЕСТВО
+        <center>
+            <h1>{{community.com_name}}</h1>
+        </center>
+        <textarea type="textarea" name="com_desc" placeholder="Описание чата" rows="4" disabled>{{community.com_description}}</textarea>
+        <hr>
+        <btn>
+            <a href="/community/create" class="createbutton">Создать сообщество</a>
+            <a href="/community/edit" class="createbutton">Редактировать сообщество</a>
+        </btn>
+        {% for chat in chats %}
+            <hr>
+            <a href="/community/center/{{community.unique_name}}/{{chat}}">{{chat}}</a>
+        {% endfor %}
+    </form>
     </div>
 </form>
 {% endblock %}

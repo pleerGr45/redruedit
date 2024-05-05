@@ -13,6 +13,8 @@
         <h1>{{community.com_name}}</h1>
         <h4>{{community.unique_name}}</h4>
     </center>
+    <label for="com_owner">Владелец</label>
+    <input type="text" name="com_owner" value="{{community.owner}}" disabled>
     <textarea type="textarea" name="com_desc" placeholder="Описание чата" rows="4" disabled>{{community.com_description}}</textarea>
     {% for com_chat in com_chats %}
         <hr>
