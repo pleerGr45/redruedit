@@ -2,9 +2,21 @@
 {% block title %} {{community.unique_name}} {% endblock %}
 {% block cmstyle %} 
 <style>
-
+    form {
+        width: 60%;
+    }
 </style>
 {% endblock %}
 {% block container %}
-
+<form action="/community/center/{{community.unique_name}}" method="post">
+    <center>
+        <h1>{{community.com_name}}</h1>
+        <h4>{{community.unique_name}}</h4>
+    </center>
+    <textarea type="textarea" name="com_desc" placeholder="Описание чата" rows="4" disabled>{{community.com_description}}</textarea>
+    {% for com_chat in com_chats %}
+        <hr>
+        <a href="/community/center/{{community.unique_name}}/{{com_chat}}">{{com_chat}}</a>
+    {% endfor %}
+</form>
 {% endblock %}

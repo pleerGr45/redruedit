@@ -1,0 +1,37 @@
+{% extends "community_base.html" %}
+{% block title %} {{chat_name}} {% endblock %}
+{% block cmstyle %} 
+<style>
+    vert_case {
+        display: flex;
+        flex-direction: column;
+    }
+
+    form {
+        display: flex;
+        width: 80%;
+    }
+
+    input[type="submit"] {
+        width: 20%;
+    }
+
+</style>
+{% endblock %}
+{% block container %}
+<vert_case>
+    <msg_case>
+        {% for msg in messages %}
+        <msg_box>
+            <h3><a href="/view_profile/{{msg[1]}}">{{msg[0]}}</a></h3>
+            <h4>{{msg[2]}}</h4>
+            <h4>{{msg[3]}}</h4>
+        </msg_box>
+        {% endfor %}
+    </msg_case>
+    <form action="/community/center/{{chat.parrent_unique_name}}/{{chat_name}}" method="post">
+        <input type="text" name="message" placeholder="Напишите сообщение" minlength="1" maxlength="256" required>
+        <input type="submit" value="Отправить">
+    </form>
+</vert_case>
+{% endblock %}

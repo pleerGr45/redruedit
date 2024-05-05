@@ -9,7 +9,7 @@
 <form action="{{url_for('community_create_chat_page')}}" method="post">
     <input type="text" name="chat_name" placeholder="Название чата" minlength="4" maxlength="32" required>
     <textarea type="textarea" name="chat_desc" placeholder="Описание чата" rows="4" maxlength="1024"></textarea>
-    <input type="submit" value="Сохранить">
+    <input type="submit" value="Создать">
     <hr>
     <a href="{{url_for('community_edit_page')}}">Назад</a>
 </form>

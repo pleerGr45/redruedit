@@ -250,23 +250,44 @@ def community_page():
 @app.route("/community/center/<unique_name>")
 @login_required
 def community_center_page(unique_name: str):
-    user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
 
     # Получение данных о сообществе
     community = session.query(Community).filter_by(unique_name=unique_name).first()
-    
+
     # Возврат шаблона community_center_page.html
-    return render_template('community_center_page.html', community=community, chats=get_root_chats(), communities=get_communities())
+    return render_template('community_center_page.html', community=community, com_chats=get_chats(community.chat_list.replace('<', '').replace('>', '')), chats=get_root_chats(), communities=get_communities())
 
 # ------------ Обработка пути '/community/center/<unique_name>/<chat_name>' ------------ 
 @app.route("/community/center/<unique_name>/<chat_name>", methods=['GET', 'POST'])
 @login_required
 def community_chat_page(unique_name: str, chat_name: str):
-    # Если метод POST
-    if request.method == 'POST':
-        user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
+    # Получение данных о пользователе
+    user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
 
-    return redirect('/')
+    # Получение данных о чате
+    chat = session.query(Chat).filter_by(parrent_unique_name=unique_name, chat_name='<' + chat_name + '>').first()
+
+    if chat:
+        # Если метод POST
+        if request.method == 'POST':
+            # Получение данных о сообщении
+            message = request.form['message']
+            msg_owner_name = user_metadata.user_name
+            msg_owner_login = user_metadata.login
+            msg_date = date_msg_format(datetime.now(pytz.timezone('Europe/Moscow')))
+
+            # Добавление сообщения в чат
+            chat.messages += f'{msg_owner_name}|{msg_owner_login}|{msg_date}|{message}^'
+            session.commit()
+
+        msgs = []
+
+        for msg in chat.messages.split('^'):
+            msgs.append(msg.split('|'))
+
+        return render_template('community_chat_page.html', chats=get_root_chats(), communities=get_communities(), chat_name=chat_name, chat=chat, messages=msgs)
+    
+    return abort(404)
 
 # ------------ Обработка пути '/community/create' ------------ 
 @app.route("/community/create", methods=['GET', 'POST'])
@@ -690,6 +711,11 @@ def date_news_format(date) -> str:
     Добавляет ноль перед числом месяца или дня, если это число < 10
     """
     return "{:02} ".format(date.day) + parse_str_month(date.month) + " {} {:02}:{:02}".format(date.year, date.hour, date.minute)
+
+# Функция форматирования даты для сообщений
+def date_msg_format(date) -> str:
+    return "{:02}.{:02}.{} {:2}:{:2}".format(date.day, date.month, date.year, date.hour, date.minute)
+
 
 # Функция преобразования номера месяца в тестовый формат
 def parse_str_month(month: int) -> str:
