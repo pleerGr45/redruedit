@@ -609,19 +609,26 @@ def delete_page():
 # ------------ Обработка пути '/delete_news/<id>' ------------ 
 @app.route("/delete_news/<id>")
 def delete_news_page(id):
+    # Данные о пользователе
+    user_metadata = session.query(Auth).filter_by(
+        id=current_user.get_id()).first()
+    
     # Получение данных о новости
     news = session.query(News).filter_by(id=id).first()
 
-    # Удаление новости
-    try:
-        remove('static/images/'+news.image)
-    except FileNotFoundError:
-        # Отправка сообщения пользователю о внутренней ошибке сервера
-        flash('Изображение не было найдено', 'warning')
+    if user_metadata.admin_access: 
+        # Удаление новости
+        try:
+            remove('static/images/'+news.image)
+        except FileNotFoundError:
+            # Отправка сообщения пользователю о внутренней ошибке сервера
+            flash('Изображение не было найдено', 'warning')
 
-    # Удаление новости
-    session.delete(news)
-    session.commit()
+        # Удаление новости
+        session.delete(news)
+        session.commit()
+    else:
+        return 404
 
     # Перенаправление на главную страницу /
     return redirect(url_for('home_page'))

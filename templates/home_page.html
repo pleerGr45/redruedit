@@ -5,6 +5,16 @@
 <link rel="stylesheet" href="{{url_for('static', filename='css/text_area_style.css')}}">
 <link rel="stylesheet" href="{{url_for('static', filename='css/image.css')}}">
 <style>
+    .home_section {
+        margin-top: -100px;
+        padding: 230px;
+        background-image: url("./static/style/images/main_home_picture.jpg");
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        height: fit-content;
+    }
+
     .likebutton {
         padding: 3px;
         border: none;
@@ -16,21 +26,29 @@
         cursor: pointer;
     }
 
+    .main_home_picture_img {
+        width: -webkit-fill-available;
+        margin: 0px;
+    }
+
     .button {
         padding: 3px;
     }
 </style>
 {% endblock %}
 {% block content %}
-{% if rights %}
-<form method="post" enctype="multipart/form-data">
-    <input type="text" name="title" placeholder="Заголовок" maxlength="32" required>
-    <label for="photo">Загрузить фото</label>
-    <input type="file" name="photo" accept="image/png,image/jpeg">
-    <textarea type="textarea" name="content" placeholder="Содержание" rows="4" maxlength="256" required></textarea>
-    <input type="submit" value="Отправить">
-</form>
-{% endif %}
+<section class="home_section">
+    {% if rights %}
+    <form method="post" enctype="multipart/form-data">
+        <input type="text" name="title" placeholder="Заголовок" maxlength="32" required>
+        <label for="photo">Загрузить фото</label>
+        <input type="file" name="photo" accept="image/png,image/jpeg">
+        <textarea type="textarea" name="content" placeholder="Содержание" rows="4" maxlength="256" required></textarea>
+        <input type="submit" value="Отправить">
+    </form>
+    {% endif %}
+</section>
+<img src="./static/style/images/picture_border.png" alt="" class="main_home_picture_img">
 {% if is_not_void %}
     {% for el in ls %}
         <form>

@@ -8,18 +8,49 @@
     {% block style %} {% endblock %}
 </head>
 <body>
-    <header> 
-        <nav> <ul> 
-                <li><a href="/">Новости</a></li> 
-                <li><a href="/community">Сообщество</a></li> 
-                <li><a href="/contact_us">Контакты</a></li>
-                <li><a href="/about_us">О нас</a></li> 
-                <li><a href="/profile">Профиль</a></li>
-        </ul> </nav>
+    <!-- Header block -->
+    <header class="header"> 
+        <div class="container">
+            <a href="/" target="_self" class="header_logo">
+                <img src="./static/style/images/icons/logo.png" alt="Лого">
+            </a>
+            <nav class="header_nav">
+                <ul class="header_list">
+                    <li><a href="/">Новости</a></li>
+                    <li><a href="/community">Сообщество</a></li> 
+                    <li><a href="/contact_us">Контакты</a></li>
+                    <li><a href="/about_us">О нас</a></li> 
+                </ul>
+            </nav>
+            {% if current_user.is_authenticated %}
+            <a href="/profile" target="_self">  
+                <img src="./static/style/images/profile_icons/{{current_user.get_id()}}.png" alt="Профиль">
+            </a>
+            {% else %}
+            <div class="header_auth">
+                <div class="auth_btn">
+                    <a href="{{url_for('login_page')}}" class="login_btn">Вход</a>
+                    <a href="{{url_for('register_page')}}" class="register_btn">Регистрация</a>
+                </div>
+                <a href="/login" target="_self">  
+                    <img class="profile_icon" src="./static/style/images/icons/profile_icon.png" alt="Профиль" width="60px" height="60px">
+                </a>
+            </div>
+            {% endif %}
+        </div>
     </header>
+    <!-- Header block end -->
+
+    <!-- FlashMessages block -->
     {% for cat, msg in get_flashed_messages(True) %}
         <div class="flash {{cat}}">{{msg}}</div>
     {% endfor %}
-    {% block content %} {% endblock %}
+    <!-- FlashMessages block end -->
+
+    <!-- Main block -->
+    <main class="main">
+        {% block content %} {% endblock %}
+    </main>
+    <!-- Main block end -->
 </body>
 </html>

@@ -1,3 +1,10 @@
+/* Main style */
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #fff;
+  background-color: #1C1C1C;
+}
+
 form {
   width: 400px;
   margin: 20px auto;
@@ -7,66 +14,148 @@ form {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-header {
-  background-color: #f5f5f5;
-  padding: 10px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+a {
+  color: #fff;
+  text-decoration: none;
 }
 
-nav ul {
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin-right: auto;
+  margin-left: auto;
+  padding: 0 25px;
+}
+
+/* Header style */
+
+.header {
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 2px 5px #1C1C1C60;
+}
+
+.header .container {
+  background-color: #1c1c1cb3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header_nav {
+  display: flex;
+  justify-content: left;
   list-style: none;
   margin: 0;
   padding: 0;
+}
+
+.header_list {
   display: flex;
-  justify-content: left;
+  align-items: center;
+  gap: 30px;
 }
 
-nav li {
-  margin-right: 20px;
-}
-
-nav a {
-  color: #333;
-  text-decoration: none;
+li a {
+  color: #bbbbbb;
   font-weight: bold;
+  font-size: 20px;
 }
 
-nav a:hover {
-  color: #666;
+li a:hover {
+  color: #fff;
+  text-decoration: none;
 }
+
+/* Кнопки авторизации */
+.header_auth {
+  display: flex;
+  align-items: center;
+  margin-right: 6%;
+}
+
+.auth_btn {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+}
+
+.login_btn {
+  background-color: #337AB7;
+  width: 68px;
+  height: 22px;
+  border: none;
+  border-radius: 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  font-style: bold;
+  margin: 5px;
+  transition: background-color 0.5s;
+}
+
+.register_btn {
+  background-color: #10C700;
+  width: 68px;
+  height: 22px;
+  border: none;
+  border-radius: 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  color: #fff;
+  font-style: bold;
+  margin: 5px;
+  transition: background-color 0.5s;
+}
+
+.login_btn:hover {
+  text-decoration: none;
+  background-color: #12528a;
+}
+
+.register_btn:hover {
+  text-decoration: none;
+  background-color: #0c7e02;
+}
+
+/* Flash style*/
 
 .flash {
+  background-color: #dff0d8;
   margin-bottom: 10px;
   padding: 10px;
   border-radius: 3px;
 }
 
-.flash.success {
-  background-color: #dff0d8;
+.flash.success {  
   border: 1px solid #d0ecd0;
   color: #5cb85c;
 }
 
 .flash.info {
-  background-color: #d8e0f0;
   border: 1px solid #9eacdf;
   color: #625cb8;
 }
 
 .flash.message {
-  background-color: #d8e0f0;
   border: 1px solid #9eacdf;
   color: #625cb8;
 }
 
 .flash.warning {
-  background-color: #fcf8e3;
   border: 1px solid #f9e2b5;
   color: #f0ad4e;
 }
 
 .flash.error {
-  background-color: #f2dcdc;
   border: 1px solid #e6b7b7;
   color: #c0392b;
 }
