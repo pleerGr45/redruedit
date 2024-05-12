@@ -122,10 +122,10 @@ for admin in admin_list:
     user = session.query(Auth).filter_by(login=inf[0]).first()
     if user:
         user.admin_access = True
-        user.status = inf[1]
-
-#session.delete(session.query(Chat).filter_by().first())
-#session.query(Community).filter_by(unique_name='root').first().chat_list = ""
+        if inf[1] == '1':
+            user.status = "Администратор"
+        else:
+            user.status = "Разработчик"
 
 session.commit()
 
@@ -162,7 +162,6 @@ def home_page():
     ls = []
     for news in list(session.query(News).filter_by()):
         ls.append([news, news.likes.count('+'), news.likes.count('-')])
-        print('start', news.likes, 'end')
     ls.reverse()
 
     # Получение данных о правах пользователя
@@ -250,12 +249,14 @@ def community_page():
 @app.route("/community/center/<unique_name>")
 @login_required
 def community_center_page(unique_name: str):
+    # Получение данных о пользователе
+    user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
 
     # Получение данных о сообществе
     community = session.query(Community).filter_by(unique_name=unique_name).first()
 
     # Возврат шаблона community_center_page.html
-    return render_template('community_center_page.html', community=community, com_chats=get_chats(community.chat_list.replace('<', '').replace('>', '')), chats=get_root_chats(), communities=get_communities())
+    return render_template('community_center_page.html', rights=user_metadata.admin_access, community=community, com_chats=get_chats(community.chat_list.replace('<', '').replace('>', '')), chats=get_root_chats(), communities=get_communities())
 
 # ------------ Обработка пути '/community/center/<unique_name>/<chat_name>' ------------ 
 @app.route("/community/center/<unique_name>/<chat_name>", methods=['GET', 'POST'])
@@ -584,6 +585,7 @@ def view_profile_page(login):
 
 # ------------ Обработка пути '/delete' ------------ 
 @app.route("/delete")
+@login_required
 def delete_page():
     # Данные о пользователе
     user_metadata = session.query(Auth).filter_by(
@@ -608,6 +610,7 @@ def delete_page():
 
 # ------------ Обработка пути '/delete_news/<id>' ------------ 
 @app.route("/delete_news/<id>")
+@login_required
 def delete_news_page(id):
     # Данные о пользователе
     user_metadata = session.query(Auth).filter_by(
@@ -635,32 +638,105 @@ def delete_news_page(id):
 
 # ------------ Обработка пути '/like_news/<id>/<like>' ------------ 
 @app.route("/like_news/<id>/<like>")
+@login_required
 def like_news_page(id, like):
     # Получение данных о новости
     news = session.query(News).filter_by(id=id).first()
 
     # Если пользователь авторизован
-    if current_user.is_authenticated:
-        user_metadata = session.query(Auth).filter_by(
-            id=current_user.get_id()).first()
-        ls = news.likes
+    user_metadata = session.query(Auth).filter_by(
+        id=current_user.get_id()).first()
+    ls = news.likes
 
-        if user_metadata.login in ls:
-            ls = ls.replace('+|'+user_metadata.login,
-                            like+'|'+user_metadata.login, 1)
-            ls = ls.replace('-|'+user_metadata.login,
-                            like+'|'+user_metadata.login, 1)
-        else:
-            ls += like + '|' + user_metadata.login + ','
-
-        news.likes = ls
-        session.commit()
+    if user_metadata.login in ls:
+        ls = ls.replace('+|'+user_metadata.login,
+                        like+'|'+user_metadata.login, 1)
+        ls = ls.replace('-|'+user_metadata.login,
+                        like+'|'+user_metadata.login, 1)
     else:
-        # Отправка сообщения поьзователю о том, что ему необходима авторизоваться
-        flash('Вы должны быть зарегистрированы', 'info')
+        ls += like + '|' + user_metadata.login + ','
+
+    news.likes = ls
+    session.commit()
 
     # Перенаправление на главную страницу /
     return redirect(url_for('home_page'))
+
+# ------------ Обработка пути '/superior_dcom/<unique_name>' ------------  
+@app.route("/superior_dcom/<unique_name>")
+@login_required
+def superior_cmd_delete_community(unique_name: str):
+    # Получение данных о потенциальном администраторе
+    user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
+
+    # Если пользователь имеет права администратора
+    if user_metadata.admin_access:
+        # Получение данных о сообществе пользователя
+        community = session.query(Community).filter_by(unique_name=unique_name).first()
+
+        # Получение данных о чатах
+        parrent_unique_name = unique_name
+        chats = get_chats(community.chat_list)
+
+        # Удаление чатов
+        for chat in chats:
+            session.delete(session.query(Chat).filter_by(parrent_unique_name=parrent_unique_name, chat_name=chat).first())
+        
+        # Удаление ссылки на сообщество у пользователя
+        session.query(Auth).filter_by(has_communty=unique_name).first().has_communty = None
+
+        # Удаление сообщества
+        session.delete(session.query(Community).filter_by(id=community.id).first())
+        session.commit()
+    else:
+        return abort(404)
+    
+    # Отправка сообщения пользователю об удалении сообщества
+    flash('Сообщество удалено', 'error')
+    # Перенаправление на /community
+    return redirect(url_for('community_page'))
+
+# ------------ Обработка пути '/superior_dchat/<parrent_unique_name>/<chat_name>' ------------  
+@app.route("/superior_dchat/<parrent_unique_name>/<chat_name>")
+@login_required
+def superior_cmd_delete_chat(parrent_unique_name: str, chat_name: str):
+    # Получение данных о потенциальном администраторе
+    user_metadata = session.query(Auth).filter_by(id=current_user.get_id()).first()
+    
+    # Форматирование имени чата
+    chat_name = '<' + chat_name + '>'
+    
+    # Если пользователь имеет права администратора
+    if user_metadata.admin_access:
+        # Получение данных о сообществе пользователя
+        community = session.query(Community).filter_by(unique_name=parrent_unique_name).first()
+
+        # Если сообщество существует
+        if community:
+            # Если чат существует
+            if chat_name in community.chat_list:
+                # Удаление чата из БД
+                session.delete(session.query(Chat).filter_by(parrent_unique_name=parrent_unique_name, chat_name=chat_name).first())
+
+                # Удаление ссылки чата из сообщества
+                community.chat_list = community.chat_list.replace(f'{chat_name},', '')
+                session.commit()
+            else:
+                # Отправка сообщения администратору о том, что данный чат не обнаружен
+                flash('Данный чат не обнаружен', 'error')
+        else:
+            # Отправка сообщения администратору о том, что такого сообщества не существует
+            flash('Сообщество не существует', 'error')
+            # Перенаправление на /community/create
+            return redirect(url_for('community_create_page'))
+    else:
+        return abort(404)
+
+    # Отправка сообщения пользователю об удалении сообщества
+    flash('Сообщество удалено', 'error')
+
+    # Перенаправление на /community
+    return redirect(url_for('community_page'))
 
 # ------------ Обработка ошибки 404 ------------ 
 @app.errorhandler(NotFound)

@@ -5,6 +5,10 @@
     form {
         width: 60%;
     }
+
+    .danger_btn  {
+        padding: 3px;
+    }
 </style>
 {% endblock %}
 {% block container %}
@@ -16,9 +20,15 @@
     <label for="com_owner">Владелец</label>
     <input type="text" name="com_owner" value="{{community.owner}}" disabled>
     <textarea type="textarea" name="com_desc" placeholder="Описание чата" rows="4" disabled>{{community.com_description}}</textarea>
+    {% if rights %}
+        <a href="/superior_dcom/{{community.unique_name}}" class="button danger_btn">Удалить сообщество</a>
+    {% endif %}
     {% for com_chat in com_chats %}
         <hr>
         <a href="/community/center/{{community.unique_name}}/{{com_chat}}">{{com_chat}}</a>
+        {% if rights %}
+        <a href="/superior_dchat/{{community.unique_name}}/{{com_chat}}" class="button danger_btn">Удалить чат</a>
+        {% endif %}
     {% endfor %}
 </form>
 {% endblock %}

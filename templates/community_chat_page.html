@@ -28,12 +28,13 @@
         width: 90%;
         height: 600px;
         overflow-y: scroll;
+        scrollbar-color: #333 #444;
     }
 
     msg_box {
         width: 60%;
         margin: 20px;
-        background-color: #f5f5f5;
+        background-color: #333;
         padding: 20px;
         border-radius: 5px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -61,10 +62,13 @@
 </style>
 {% endblock %}
 {% block container %}
-<form>
-    <textarea type="textarea" name="com_desc" placeholder="Описание чата" rows="4" disabled>{{chat.chat_description}}</textarea>
-</form>
 <vert_case>
+<center>
+    <form>
+        <textarea type="textarea" name="com_desc" placeholder="Описание чата" rows="4" disabled>{{chat.chat_description}}</textarea>
+    </form>
+</center>
+
     <div class="msg_case">
         {% for msg in messages %}
         <msg_box>
