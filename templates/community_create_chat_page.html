@@ -7,7 +7,7 @@
 {% endblock %}
 {% block container %}
 <form action="{{url_for('community_create_chat_page')}}" method="post">
-    <input type="text" name="chat_name" placeholder="Название чата" minlength="4" maxlength="32" required>
+    <input type="text" name="chat_name" placeholder="Название чата" pattern="[a-zA-Zа-яА-Я0-9_]*" title="Имя чата может содержать только латинские и русские буквы, цифры и нижнее подчеркивание" minlength="4" maxlength="32" required>
     <textarea type="textarea" name="chat_desc" placeholder="Описание чата" rows="4" maxlength="1024"></textarea>
     <input type="submit" value="Создать">
     <hr>

@@ -31,7 +31,7 @@
     </div>
     <div>
         <label for="com_name">Отображаемое имя</label>
-        <input type="text" name="com_name" value="{{community.com_name}}" placeholder="Не указано" minlength="4" maxlength="32" required>
+        <input type="text" name="com_name" value="{{community.com_name}}" placeholder="Не указано" pattern="[a-zA-Zа-яА-Я0-9_]*" title="Имя сообщества может содержать только латинские и русские буквы, цифры и нижнее подчеркивание" minlength="4" maxlength="32" required>
     </div>
     <div>
         <label for="com_desc">Описание сообщества</label>

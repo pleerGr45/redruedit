@@ -15,7 +15,7 @@
     </div>
     <div>
         <label for="user_name">Имя пользователя</label>
-        <input type="text" name="user_name" value="{{profile.user_name}}" minlength="5" maxlength="32" required>
+        <input type="text" name="user_name" value="{{profile.user_name}}" pattern="[a-zA-Zа-яА-Я_]*" title="Имя может содержать только латинские, русские буквы и нижнее подчеркивание" minlength="5" maxlength="32" required>
     </div>
     <div>
         <label for="user_e_mail">Электронная почта</label>
@@ -23,7 +23,7 @@
     </div>
     <div>
         <label for="user_phone">Номер телефона</label>
-        <input type="tel" name="user_phone" pattern="[7]{1}-[0-9]{3}-[0-9]{3}-[0-9]{2}-[0-9]{2}" value="{% if profile.user_phone != None %}{{profile.user_phone}}{% endif %}" placeholder="7-XXX-XXX-XX-X">
+        <input type="tel" name="user_phone" pattern="[7]{1}-[0-9]{3}-[0-9]{3}-[0-9]{2}-[0-9]{2}" title="Номер телефона должен быть в формате 7-???-???-??-??. Дефисы ставить нужно" value="{% if profile.user_phone != None %}{{profile.user_phone}}{% endif %}" placeholder="7-???-???-??-??">
     </div>
     <div>
         <label for="user_about">Информация о пользователе</label>

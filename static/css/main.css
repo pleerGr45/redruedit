@@ -129,33 +129,33 @@ li a:hover {
 /* Flash style*/
 
 .flash {
-  background-color: #dff0d8;
+  background-color: #333;
   margin-bottom: 10px;
   padding: 10px;
   border-radius: 3px;
 }
 
 .flash.success {  
-  border: 1px solid #d0ecd0;
-  color: #5cb85c;
+  border: 1px solid #3be961;
+  color: #3be961;
 }
 
 .flash.info {
-  border: 1px solid #9eacdf;
-  color: #625cb8;
+  border: 1px solid #4c3be9;
+  color: #4c3be9;
 }
 
 .flash.message {
-  border: 1px solid #9eacdf;
-  color: #625cb8;
+  border: 1px solid #5c3ada;
+  color: #5c3ada;
 }
 
 .flash.warning {
-  border: 1px solid #f9e2b5;
-  color: #f0ad4e;
+  border: 1px solid #dabd3a;
+  color: #dabd3a;
 }
 
 .flash.error {
-  border: 1px solid #e6b7b7;
-  color: #c0392b;
+  border: 1px solid #da3a3a;
+  color: #da3a3a;
 }

@@ -13,7 +13,7 @@
     </div>
     <div>
         <label for="chat_name">Имя чата</label>
-        <input type="text" name="chat_name" value="{{chat_format_name}}" placeholder="Не указано" minlength="4" maxlength="32" required>
+        <input type="text" name="chat_name" value="{{chat_format_name}}" placeholder="Не указано" pattern="[a-zA-Zа-яА-Я0-9_]*" title="Имя чата может содержать только латинские и русские буквы, цифры и нижнее подчеркивание" minlength="4" maxlength="32" required>
     </div>
     <div>
         <label for="chat_desc">Описание чата</label>

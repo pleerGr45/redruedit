@@ -7,8 +7,8 @@
 {% endblock %}
 {% block container %}
 <form action="{{url_for('community_create_page')}}" method="post">
-    <input type="text" name="com_unique_name" placeholder="Уникальное имя сообщества" minlength="4" maxlength="32" required>
-    <input type="text" name="com_name" placeholder="Отображаемое имя сообщества" minlength="4" maxlength="32" required>
+    <input type="text" name="com_unique_name" placeholder="Уникальное имя сообщества" type="text" pattern="[a-zA-Z0-9_]*" title="Уникальное имя может содержать только латинские буквы, цифры и нижнее подчеркивание" minlength="4" maxlength="32" required>
+    <input type="text" name="com_name" placeholder="Отображаемое имя сообщества" minlength="4" maxlength="32" pattern="[a-zA-Zа-яА-Я0-9_]*" title="Имя сообщества может содержать только латинские и русские буквы, цифры и нижнее подчеркивание" required>
     <textarea type="textarea" name="com_desc" placeholder="Описание сообщества" rows="4" maxlength="1024"></textarea>
     <input type="submit" value="Создать">
 </form>

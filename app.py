@@ -193,7 +193,7 @@ def login_page():
             # Отправка сообщения пользователю об успехе
             flash('Произошёл успешный вход', 'success')
             # Перенаправление на главную страницу /
-            return redirect(url_for('home_page'))
+            return redirect(url_for('profile_page'))
 
         # Отправка сообщения пользователю об ошибке
         flash('Неверная пара логина и пароля', 'error')
@@ -733,7 +733,7 @@ def superior_cmd_delete_chat(parrent_unique_name: str, chat_name: str):
         return abort(404)
 
     # Отправка сообщения пользователю об удалении сообщества
-    flash('Сообщество удалено', 'error')
+    flash('Чат удален', 'error')
 
     # Перенаправление на /community
     return redirect(url_for('community_page'))

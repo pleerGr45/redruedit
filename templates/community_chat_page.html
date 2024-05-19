@@ -80,7 +80,7 @@
         {% endfor %}
     </div>
     <form action="/community/center/{{chat.parrent_unique_name}}/{{chat_name}}" method="post">
-        <input type="text" name="message" placeholder="Напишите сообщение" minlength="1" maxlength="256" required>
+        <input type="text" name="message" placeholder="Напишите сообщение" pattern="[^\|]+" title="Сообщение не может содержать символ |" minlength="1" maxlength="256" required>
         <input type="submit" value="Отправить">
     </form>
 </vert_case>
