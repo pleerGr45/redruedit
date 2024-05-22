@@ -15,6 +15,12 @@
         height: fit-content;
     }
 
+    .news_section {
+        display: ruby-text;
+        column-count: 2;
+        padding: 0 100px;
+    }
+
     .likebutton {
         padding: 3px;
         border: none;
@@ -49,6 +55,8 @@
     {% endif %}
 </section>
 <img src="./static/style/images/picture_border.png" alt="" class="main_home_picture_img">
+<center>
+<section class="news_section">
 {% if is_not_void %}
     {% for el in ls %}
         <form>
@@ -66,4 +74,6 @@
         </form>
     {% endfor %}
 {% endif %}
+</section>
+</center>
 {% endblock %}
